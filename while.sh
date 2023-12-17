@@ -1,0 +1,13 @@
+#!/bin/bash
+
+#While loop
+while read -p "Digite um numero: " c_input
+do
+    if [ $c_input -gt 25 ]; then
+        echo "Numero $c_input é maior que 25"
+        break
+    else
+        echo "Numero $c_input é menor que 25"
+        break
+    fi
+done
