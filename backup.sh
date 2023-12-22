@@ -1,56 +1,38 @@
 #!/bin/bash
 
-DATA=$(date +%y%m%d)
+DIRETORIO=$HOME
+DIRETORIOBACKUP=$HOME/Backup
+BACKUP="backup_home_$(date +%Y%m%d%H%M).tgz"
+DAYS7=$(find $DIRETORIOBACKUP -ctime -7 -name backup_home\*tgz)
 
-FILE=archive$DATE.tar.gz
 
-CONFIG_FILE=/archive/Files_To_Backup
-DESTINATION=/archive/$FILE
-
-if [ -f $CONFIG_FILE ]
-then
-    echo
-else
-    echo
-    echo "$CONFIG_FILE não existe."
-    echo "Backup não concluído devido à falta do arquivo de configuraçao"
-    echo
-    exit
+if [ ! -d $DIRETORIOBACKUP ]; then
+	echo "Criando o diretório $DIRETORIOBACKUP..."
+	mkdir -p "$DIRETORIOBACKUP"
 fi
 
-FILE_NO=1
-exec < $CONFIG_FILE
-read FILE_NAME
-
-while [ $? -eq 0 ]
-do
-if [ -f $FILE_NAME -o -d $FILE_NAME ]
-   then
-	FILE_LIST="$FILE_LIST $FILE_NAME"
-   else
+if [ "$DAYS7" ]; then
+	echo "Já foi gerado um backup do diretório $HOME nos últimos 7 dias."
 	echo
-	echo "$ FILE_NAME, não exsite."
-	echo "Obviamente, nõa o incluirei neste arquivo."
-	echo "Está listado na linha $ FILE_NO do arquivo de configuração."
-	echo "Continuando a construir lista de arquivos..."
+	read -p "Deseja continuar? (y/n): " resposta
 	echo
+	if [ ${resposta,,} = 'y' ]; then
+		echo "Será criado mais um backup para a mesma semana."
+	elif [ ${resposta,,} = 'n' ]; then  # Adição do espaço após 'n' e antes do colchete fechado
+		echo "Backup abortado!"
+		exit 1
+	else
+		echo "Resposta inválida"
+		exit 2
+	fi  # Adição do 'fi' para fechar a estrutura condicional corretamente
 fi
 
-FILE_NO=$[$FILE_NO + 1]
-read FILE_NAME
 
-done
+echo "Criando backup..."
+tar zcvpf $DIRETORIOBACKUP/$BACKUP --absolute-names --exclude="$DIRETORIOBACKUP" "$HOME"/* > /dev/null
 
-echo "Arquivo inicial..."
 echo
-
-
-tar -czf $DESTINATION $FILE_LIST 2> /dev/null
-
-echo "Backup finalizado"
-echo "O arquivo resultante é: $DESTINATION"
+echo "O backup de nome \""$BACKUP"\" foi criado em $DIRETORIOBACKUP"
 echo
-
-exit
-
+echo "Backup Concluído!"
 
