@@ -1,22 +1,24 @@
 #!/bin/bash
 
-ls /home/$1 > /dev/null 2>&1 || { echo "Usuario Inexistente" ; exit 1; }
+read -p "Digite o nome do usuário: " USUARIO
 
-USERID=$(grep $1 /etc/passwd|cut -d":" -f3)
-DESC=$(grep $1 /etc/passwd|cut -d":" -f5 | tr -d ,)
-USOHOME=$(du -sh /home/$1|cut -f1)
+ls /home/$USUARIO > /dev/null 2>&1 || { echo "Usuario Inexistente" ; exit 1; }
+
+USERID=$(grep $USUARIO /etc/passwd|cut -d":" -f3)
+DESC=$(grep $USUARIO /etc/passwd|cut -d":" -f5 | tr -d ,)
+USOHOME=$(du -sh /home/$USUARIO|cut -f1)
 
 clear
 
 echo "===================================================================================="
-echo "Relatório do Usuário: $1"
+echo "Relatório do Usuário: $USUARIO"
 echo
 echo "UID: $USERID"
 echo "Nome ou Descrição: $DESC"
 echo
-echo "Total Usado no /home/$1: $USOHOME"
+echo "Total Usado no /home/$USUARIO: $USOHOME"
 echo
 echo "Último login:"
-lastlog -u $1
+lastlog -u $USUARIO
 echo "===================================================================================="
 exit 0
